@@ -1,5 +1,31 @@
 version: "2"
 services:
+  pg_auth:
+    image: postgres:15.2-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_wal_senders=1"
+      - "-c"
+      - "max_replication_slots=1"
+      - "-c"
+      - "log_min_error_statement=fatal"
+      - "-c"
+      - "listen_addresses=*"
+    networks:
+      - kafka_net
+
   kafdrop:
     image: obsidiandynamics/kafdrop
     restart: "no"
@@ -10,6 +36,9 @@ services:
       JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
     depends_on:
       - "kafka"
+    networks:
+      - kafka_net
+
   kafka:
     image: obsidiandynamics/kafka
     restart: "no"
@@ -25,3 +54,12 @@ services:
       KAFKA_RESTART_ATTEMPTS: "10"
       KAFKA_RESTART_DELAY: "5"
       ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL: "0"
+    networks:
+      - kafka_net
+
+networks:
+  kafka_net:
+    driver: bridge
+
+volumes:
+  db_data:    

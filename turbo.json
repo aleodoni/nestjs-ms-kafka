@@ -9,8 +9,14 @@
         "^build"
       ],
       "outputs": [
+        "dist/**",
         ".next/**",
         "!.next/cache/**"
+      ],
+      "env": [
+        "KAFKA_BROKERS",
+        "KAFKA_AUTH_GROUP_ID",
+        "KAFKA_VOTING_GROUP_ID"
       ]
     },
     "lint": {},

@@ -1,29 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
+import { VoteModule } from './vote/vote.module';
+import { validate } from './shared/config/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    ClientsModule.register([
-      {
-        name: 'VOTING_SERVICE',
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'voting',
-            brokers: ['localhost:9092'],
-          },
-          consumer: {
-            groupId: 'voting-consumer',
-          },
-        },
-      },
-    ]),
+    ConfigModule.forRoot({ isGlobal: true, validate }),
+    UserModule,
+    VoteModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
